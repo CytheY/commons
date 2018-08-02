@@ -1,5 +1,6 @@
 package org.value.commons.mongodb;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.FindIterable;
@@ -61,7 +62,7 @@ public abstract class AbstractMongoDbRepository<T extends EntityBase> implements
 			JsonNode object = node.get("value");
 			entity = mapper.readValue(object.toString(), type);
 		} catch (IOException e) {
-			Log.info("Could not deserialize json:" + document.toJson());
+			Log.info("Could not deserialize json:" + document.toJson(), e);
 		}
 		return entity;
 	}
@@ -78,8 +79,8 @@ public abstract class AbstractMongoDbRepository<T extends EntityBase> implements
 			objectWrapper.append("value", parse);
 
 			database.getCollection(collectionName).insertOne(objectWrapper);
-		} catch (Exception e) {
-			Log.info(e.getMessage());
+		} catch (JsonProcessingException e) {
+			Log.info("Unable to map object " + Value.toString() + " to json string.", e);
 		}
 	}
 
